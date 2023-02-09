@@ -10,19 +10,53 @@ app.get('/', (req, res)=>{
     })
 })
 
-app.get('/recommend/meal', async(req, res)=>{
-    let filters = req.body.filters
+app.get('/recipe', async(req, res)=>{
+    let mealName = req.body.mealName
     try{
-        let result = await ai.sendMessage(`I just want the mealName, recipe(concise as possible, linebreaks should be marked with /n), nutritional values with unit, and the prepTime based on this filters: ${filters.map(f=>`${f.filterName} = ${f.filterData},`)}.`, {
+        let mealRecommendation = await ai.sendMessage(`This is the mealName: ${mealName}. I just want the mealName and recipe(concise as possible, should be an object with 2 array properties, which are the ingredients and instruction set that each instruction should be a separate item)`, {
             promptPrefix: `You are the ultimate meal recommendation system and you ALWAYS have a meal recommendation. You answer as concisely as possible for each response and 
             always in JSON format. It is very important that you answer as concisely as possible, so please remember this. The request will include what they want as information, 
             so just focus on that.`
         })
-        res.send(result.text)
+        console.log("/recipe --- successful response from chatGPT")
+        res.status(200).send(JSON.parse(mealRecommendation.text))
     }catch(err){
         console.log(`error: ${err}`)
-        res.send("Server issues. Please try again later.")
-        // retry the request logic here
+        res.status(500).send({message: "chatGPT Server issues. Please try again later."})
+    }
+})
+
+app.get('/recommend_meal', async(req,res)=>{
+    let filters = req.body.filters
+    try{
+        let mealRecommendation = await ai.sendMessage(`I just want the mealName, 1 sentence concise description, nutritional values with unit, and the prepTime based on this filters: 
+                ${filters.map(f=>`${f.filterName} = ${f.filterData},`)}.`, {
+            promptPrefix: `You are the ultimate meal recommendation system and you ALWAYS have a meal recommendation. You answer as concisely as possible for each response and 
+            always in JSON format. It is very important that you answer as concisely as possible, so please remember this. The request will include what they want as information, 
+            so just focus on that.`
+        })
+        console.log("/recommend/meal --- successful response chatGPT")
+        res.status(200).send(JSON.parse(mealRecommendation.text))
+    }catch(err){
+        console.log(`error: ${err}`)
+        res.status(500).send({message: "chatGPT Server issues. Please try again later."})
+    }
+})
+
+app.get('/recommend_meal/list', async(req,res)=>{
+    let mealList = req.body.mealList
+    try{
+        let mealRecommendation = await ai.sendMessage(`Recommend a meal. I just want the mealName, 1 sentence concise description, nutritional values with unit, reason why you recommended it, and the prepTime based on this existing list: 
+                ${mealList.map(f=>`${f.mealName},`)}. Make sure that you will recommend the most logical meal based on the other meals on the list. DO NOT RESPOND WITH a meal ALREADY in the list, this is important.`, {
+            promptPrefix: `You are the ultimate meal recommendation system and you ALWAYS have a meal recommendation. You answer as concisely as possible for each response and 
+            always in JSON format. It is very important that you answer as concisely as possible, so please remember this. The request will include what they want as information, 
+            so just focus on that.`
+        })
+        console.log("/recommend/meal --- successful response chatGPT")
+        res.status(200).send(JSON.parse(mealRecommendation.text))
+    }catch(err){
+        console.log(`error: ${err}`)
+        res.status(500).send({message: "chatGPT Server issues. Please try again later."})
     }
 })
 
