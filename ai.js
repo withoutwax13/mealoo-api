@@ -1,6 +1,10 @@
 import { ChatGPTAPI } from 'chatgpt'
+import dotenv from 'dotenv'
+
+dotenv.config()
+
 const api = new ChatGPTAPI({
-    apiKey: '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',
+    apiKey: process.env.OPENAI_API_KEY,
     maxResponseTokens: 4000
 })
 

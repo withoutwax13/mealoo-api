@@ -11,6 +11,7 @@ app.get('/', (req, res)=>{
 })
 
 app.get('/recipe', async(req, res)=>{
+    if(req.body.mealName === undefined){ res.status(422).send("Missing a required body param")}
     let mealName = req.body.mealName
     try{
         let mealRecommendation = await ai.sendMessage(`This is the mealName: ${mealName}. I just want the mealName and recipe(concise as possible, should be an object with 2 array properties, which are the ingredients and instruction set that each instruction should be a separate item)`, {
@@ -27,6 +28,7 @@ app.get('/recipe', async(req, res)=>{
 })
 
 app.get('/recommend_meal', async(req,res)=>{
+    if(req.body.filters === undefined){ res.status(422).send("Missing a required body param")}
     let filters = req.body.filters
     try{
         let mealRecommendation = await ai.sendMessage(`I just want the mealName, 1 sentence concise description, nutritional values with unit, and the prepTime based on this filters: 
@@ -44,6 +46,7 @@ app.get('/recommend_meal', async(req,res)=>{
 })
 
 app.get('/recommend_meal/list', async(req,res)=>{
+    if(req.body.mealList === undefined){ res.status(422).send("Missing a required body param")}
     let mealList = req.body.mealList
     try{
         let mealRecommendation = await ai.sendMessage(`Recommend a meal. I just want the mealName, 1 sentence concise description, nutritional values with unit, reason why you recommended it, and the prepTime based on this existing list: 
