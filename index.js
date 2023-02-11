@@ -1,6 +1,7 @@
 import express from 'express'
 import { generateMeal, generateSmartMeal } from './recommendation.js'
 import { getRecipe } from './recipe.js'
+import { generateSmartList } from './smartList.js'
 
 const app = express()
 app.use(express.json())
@@ -47,6 +48,14 @@ app.get('/recommend_meal/list', async(req,res)=>{
         newMeal = await generateSmartMeal(mealList)
     }
     res.status(200).send(JSON.parse(newMeal))
+})
+
+// get a smartList with N number of meals based on a filter
+app.get('/recommend_smartlist', async(req, res)=>{
+    let filters = req.body.filters
+    let mealNumber = req.body.mealNumber
+    let smartList = await generateSmartList(filters, mealNumber)
+    res.status(200).send(smartList)
 })
 
 app.listen(8080, ()=>{
